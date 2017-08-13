@@ -24,7 +24,47 @@ $ mvn install:install-file -Dfile=/path-to-project-root/extlibs/endeca_navigatio
 - Setup a Tomcat 8 server, you'll have to download and install Tomcat 8 if you haven't already and then set that up in Eclipse. 
 	- If you need help setting up your server in Eclipse, you can follow this tutorial on [Youtube](https://www.youtube.com/watch?v=skltzZH7i4w), fast-forward to the 6:55 mark in the video to where he shows you how to setup a server in Eclipse. 
 
-- OPTIONAL, If you're on a unix system, you can set up a pre-push git hook to run the test suite before pushing your cahnges to the repo. To do this, simple cp the `pre-push` file in the root directory of this project to `PATH/TO/PROJECT/finder/.git/hooks/`. PLEASE NOTE: You'll need update the test suite to include relevant data for your endeca instance.
+- OPTIONAL, If you're on a unix system, you can create a pre-push git hook so that everytime you try to push code to the repo, you will first run the test suite to make sure there are no errors. To do this, create a file under /PATH/TO/PROJECT/ROOT/.git/hooks/ called pre-push with the contents of this file being:
+
+```sh
+#!/bin/bash
+
+# save the file as <git_directory>/.git/hooks/pre-push
+
+echo "Running \"mvn clean test\" to check for errors"
+# retrieving current working directory
+
+CWD=`pwd`
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+# go to main project dir
+cd $ROOT_DIR
+
+# Redirect output to stderr.
+exec 1>&2
+
+# running maven clean test
+mvn clean test
+
+# check "$?" to ge the return value of the mvn command
+# 0 means the tests succeeded
+if [ $? -ne 0 ]; then
+  cat <<\EOF
+Error: mvn clean test failed.
+
+Please fix your errors and try committing again.
+EOF
+  # go back to current working dir
+  cd $CWD
+  exit 1
+fi
+
+# go back to current working dir
+cd $CWD
+```
+
+ - Next, make sure the pre-push file is executable by running:
+ `$ chmod 755 pre-push`
 
 
 
