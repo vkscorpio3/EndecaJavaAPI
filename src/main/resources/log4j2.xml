@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<Configuration status="DEBUG">
+	<Properties>
+		<Property name="log-path">${sys:catalina.home}/logs</Property>
+	</Properties>
+	<Appenders>
+		<RollingFile name="RollingFile" fileName="${log-path}/finder.log"
+			filePattern="${log-path}/finder.%d{yyyy-MM-dd}.log" >
+			<PatternLayout>
+				<pattern>%d{ISO8601} - %p %C(%M):%L - %m%n</pattern>
+			</PatternLayout>
+			<DefaultRolloverStrategy max="7"/>
+			<TimeBasedTriggeringPolicy />
+		</RollingFile>
+		<Console name="Console" target="SYSTEM_OUT">
+      		<PatternLayout pattern="%d{ISO8601} - %p %C(%M):%L - %m%n"/>
+    	</Console>
+	</Appenders>
+	<Loggers>
+		<Root level="debug" additivity="false">
+			<AppenderRef ref="RollingFile" level="debug"/>
+			<AppenderRef ref="Console" level="all"/>
+		</Root>
+	</Loggers>
+</Configuration>
